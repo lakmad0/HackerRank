@@ -33,42 +33,53 @@ public class ProjectEuler19 {
 
     public static int calculateSundays( Date date1, Date date2){
         int count = 0;
-
-        if (date1.day > 1)
-            date1.month++;
-
-        //for starting year
-        for (int m = date1.month; m <= 12; m++) {
-            if (getDate(date1.year, m, 1) == 0)  // Sunday
-                count++;
-        }
-
-        //for end year
-        for (int m = 1; m <= date2.month; m++) {
-            if (getDate(date2.year, m, 1) == 0)  // Sunday
-                count++;
-        }
-
-        //for intemideate years
-        for (long y = date1.year+1; y <= date2.year -1 ; y++) {
-            for (int m = 1; m <= 12; m++) {
-                if (getDate(y, m, 1) == 0)  // Sunday
-                count++;
-            }
-        }
+        count = getSundays(date1, date2) - getSundaysBeforeStart(date1) - getSudaysAfterEnd(date2);
+        if (date1.day == 1 && getDate(date1.year, date1.month, 1) == 0)
+            count++;
 
         return count ;
     }
 
 
-    public static int getDate(long year,int month, int day){
-        int m = (month - 2 + 12) % 12;
-        if (month <= 2){
-            year--;
+    public static int getSundays(Date date1, Date date2){
+        int count = 0;
+        for (long y = date1.year; y <= date2.year ; y++) {
+            for (int m = 1; m <= 12; m++) {
+                if (getDate(y, m, 1) == 0)  // Sunday
+                    count++;
+            }
         }
 
-        int y = 5 * (int)(year % 4) + 4 * (int)( year % 100) + 6 * (int)(year % 400) ;
-        int dayOfWeek = (day + (int) (2.6 * m - 0.2) + y) % 7 ;
+        return count;
+    }
+
+    public static int getSundaysBeforeStart(Date date1){
+        int count = 0;
+        for (int m = 1; m <= date1.month; m++) {
+            if (getDate(date1.year, m, 1) == 0)  // Sunday
+                count++;
+        }
+
+        return count;
+    }
+
+    public static int getSudaysAfterEnd(Date date2){
+        int count = 0;
+        for (int m = date2.month+1 ; m <=12 ; m++) {
+            if (getDate(date2.year, m, 1) == 0)  // Sunday
+                count++;
+        }
+
+        return count;
+    }
+
+    public static int getDate(long year,int month, int day){
+
+        int adjustment = (14 - month) /12 ;
+        int m = month + 12 * adjustment - 2 ;
+        long y = year - adjustment;
+
+        int dayOfWeek = (int)(( day + (13 * m - 1) /5 + y + y/4 - y/100 +y/400) % 7) ;
 
         return dayOfWeek;
     }
